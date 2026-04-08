@@ -1,0 +1,100 @@
+{
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
+  "includeCoAuthoredBy": false,
+  "enabledMcpjsonServers": ["context7", "memory", "sequential-thinking", "azure-devops"],
+  "permissions": {
+    "ask": ["Bash(git push:*)", "Bash(npm publish:*)", "Bash(docker push:*)"],
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf /)",
+      "Bash(del /s:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(git clean -f:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git stash drop:*)",
+      "Bash(git checkout -- .)",
+      "Bash(git checkout -- :*)",
+      "Bash(git restore .)",
+      "Bash(git restore --staged:*)",
+      "Edit(**/.git/**)",
+      "Edit(.git/**)",
+      "Edit(**/.env*)",
+      "Edit(.env*)",
+      "Edit(**/secrets/**)",
+      "Edit(**/credentials*)",
+      "Edit(**/generated/**)",
+      "Edit(**/obj/**)",
+      "Edit(**/bin/**)",
+      "Edit(**/dist/**)",
+      "Edit(**/node_modules/**)",
+      "Read(**/.git/**)",
+      "Read(.git/**)",
+      "Read(**/.env*)",
+      "Read(.env*)",
+      "Read(**/secrets/**)",
+      "Read(**/credentials*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gcloud/**)",
+      "Write(**/.git/**)",
+      "Write(.git/**)",
+      "Write(**/.env*)",
+      "Write(.env*)",
+      "Write(**/secrets/**)",
+      "Write(**/credentials*)",
+      "Write(**/generated/**)",
+      "Write(**/obj/**)",
+      "Write(**/bin/**)",
+      "Write(**/dist/**)",
+      "Write(**/node_modules/**)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/statusline.js",
+    "padding": 0
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|MultiEdit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/file-guard.js\"",
+            "description": "Block AI access to sensitive files (.env, keys, credentials)"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/search-before-code.js\"",
+            "description": "Remind to search existing patterns before writing code"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-biome.js\"",
+            "description": "Auto-format files with Biome after edits"
+          }
+        ]
+      }
+    ]
+  }
+}
